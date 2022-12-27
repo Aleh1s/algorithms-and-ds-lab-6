@@ -45,8 +45,6 @@ public class Player {
     }
 
     public void setCards(ArrayList<Card> cards) {
-        if (cards.size() > 7)
-            throw new IllegalStateException("Cards number cannot be more than 7, but actually is " + cards.size());
         this.cards = cards;
     }
 

@@ -40,10 +40,6 @@ public class GameSession {
         log.trace("Start is terminated");
     }
 
-    public void takeStep(Card card) {
-
-    }
-
     private void chooseNextPlayer() {
         log.trace("Choose next player is invoked");
         if (Objects.nonNull(looser)) {
@@ -60,5 +56,17 @@ public class GameSession {
             }
         }
         log.trace("Choose next player is terminated");
+    }
+
+    public Player getUser() {
+        return user;
+    }
+
+    public Player getBot() {
+        return bot;
+    }
+
+    public GameBoard getGameBoard() {
+        return gameBoard;
     }
 }

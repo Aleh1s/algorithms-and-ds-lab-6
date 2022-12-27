@@ -1,6 +1,6 @@
 package org.example.model;
 
-public enum Value {
+public enum Rank {
 
     TWO(2),
     THREE(3),
@@ -19,7 +19,7 @@ public enum Value {
 
     private final int amount;
 
-    Value(int amount) {
+    Rank(int amount) {
         this.amount = amount;
     }
 

@@ -1,4 +1,4 @@
-<Configuration xmlns="http://logging.apache.org/log4j/2.0/config">
+<Configuration>
     <Appenders>
         <Console name="consoleAppender" target="SYSTEM_OUT">
             <PatternLayout pattern="%d [%t] %-5level %logger{36} - %msg%n%throwable"/>
@@ -7,6 +7,7 @@
     <Loggers>
         <Root level="all">
             <AppenderRef ref="consoleAppender"/>
+            <AppenderRef ref="fileAppender"/>
         </Root>
     </Loggers>
 </Configuration>

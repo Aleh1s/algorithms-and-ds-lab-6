@@ -3,10 +3,7 @@ package org.example.model;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Objects;
-import java.util.Stack;
+import java.util.*;
 
 /**
  * Редуду
@@ -45,13 +42,16 @@ public class GameBoard {
     private static final Logger log = LogManager.getLogger(GameBoard.class);
     private Stack<Card> generalDeck;
     private Card generalTrump;
-    private Card currCard;
+    private LinkedList<Card> currCards;
+    private HashMap<Card, Card> beatenCards;
     private Player attackingPlayer;
     private Player defendingPlayer;
     private static final int PLAYERS_DECK_SIZE = 12;
     private static final int PLAYER_CARDS_SIZE = 7;
 
     private GameBoard() {
+        currCards = new LinkedList<>();
+        beatenCards = new HashMap<>();
     }
 
     public static GameBoard newGameBoard() {
@@ -65,6 +65,8 @@ public class GameBoard {
     public Card getGeneralTrump() {
         return generalTrump;
     }
+
+    public LinkedList<Card> getCurrCards() {return currCards;}
 
     public void initDeck() {
         log.trace("Init deck is invoked");
