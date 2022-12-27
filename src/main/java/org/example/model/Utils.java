@@ -9,14 +9,14 @@ import java.util.stream.Collectors;
 public class Utils {
 
     private static final Logger log = LogManager.getLogger(Utils.class);
-    private static final ArrayList<Card> deckOfCards;
+    private static final ArrayList<Card> cards;
 
     static {
-        deckOfCards = initDeckOfCards();
+        cards = initCards();
     }
 
-    private static ArrayList<Card> initDeckOfCards() {
-        log.trace("Init deck of cards invoked");
+    private static ArrayList<Card> initCards() {
+        log.trace("Init cards invoked");
         ArrayList<Card> cards = EnumSet.range(Value.TWO, Value.ACE)
                 .stream()
                 .map(Utils::buildCardsOfAllSuitsFromValue)
@@ -31,8 +31,8 @@ public class Utils {
         log.trace("Add jokers");
         cards.addAll(jokers);
 
-        log.debug("Cards in deck {}", cards);
-        log.debug("Number of cards in deck {}", cards.size());
+        log.debug("Cards {}", cards);
+        log.debug("Number of cards {}", cards.size());
 
         return cards;
     }
@@ -45,7 +45,11 @@ public class Utils {
                 .collect(Collectors.toCollection(LinkedList::new));
     }
 
-    public static ArrayList<Card> getDeckOfCards() {
-        return new ArrayList<>(deckOfCards);
+    public static ArrayList<Card> getCards() {
+        return new ArrayList<>(cards);
+    }
+
+    public static void shuffleCards(ArrayList<Card> cards) {
+        Collections.shuffle(cards);
     }
 }

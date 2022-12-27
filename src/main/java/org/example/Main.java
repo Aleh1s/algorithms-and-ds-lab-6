@@ -1,13 +1,21 @@
 package org.example;
 
-import org.example.model.Card;
-import org.example.model.Utils;
+import javafx.application.Application;
+import javafx.scene.Group;
+import javafx.scene.Scene;
+import javafx.stage.Stage;
 
-import java.util.ArrayList;
-
-public class Main {
+public class Main extends Application {
 
     public static void main(String[] args) {
-        ArrayList<Card> deckOfCards = Utils.getDeckOfCards();
+        launch(args);
+    }
+
+    @Override
+    public void start(Stage stage) throws Exception {
+        Group root = new Group();
+        Scene scene = new Scene(root);
+        stage.setScene(scene);
+        stage.show();
     }
 }
