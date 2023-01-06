@@ -87,25 +87,6 @@ public class Player {
                 '}';
     }
 
-//    public void takeCards() {
-//        log.trace("Player {} takes cards", name);
-//        Stack<Card> gameBoardDeck = gameBoard.getGeneralDeck();
-//        while (this.hand.size() < MAX_NUMBER_OF_CARDS) {
-//            if (gameBoardDeck.empty()) {
-//                if (this.deck.empty()) {
-//                    log.debug("Decks are empty");
-//                    break;
-//                }
-//                hand.add(this.deck.pop());
-//                log.debug("Player {} took card from own deck", name);
-//            } else {
-//                hand.add(gameBoardDeck.pop());
-//                log.debug("Player {} took card from game board deck", name);
-//            }
-//        }
-//        log.trace("Player {} took cards", name);
-//    }
-
     @SuppressWarnings("unchecked")
     public Player copy() {
         ArrayList<Card> handCopy = new ArrayList<>(this.getHand());
