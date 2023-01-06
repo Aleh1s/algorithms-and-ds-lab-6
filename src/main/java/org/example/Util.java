@@ -1,55 +1,108 @@
 package org.example;
 
-import java.io.File;
+import java.util.*;
 
 public class Util {
     public static void main(String[] args) {
-        File root = new File("D:\\PNG-cards-1.3");
-        File[] files = root.listFiles();
-        for (File file : files) {
-            String name = file.getName(), newName = null;
-            if (name.startsWith("2")) {
-                newName = replace(name, "2", "two");
-            } else if (name.startsWith("3")) {
-                newName = replace(name, "3", "three");
-            } else if (name.startsWith("4")) {
-                newName = replace(name, "4", "four");
-            } else if (name.startsWith("5")) {
-                newName = replace(name, "5", "five");
-            } else if (name.startsWith("6")) {
-                newName = replace(name, "6", "six");
-            } else if (name.startsWith("7")) {
-                newName = replace(name, "7", "seven");
-            } else if (name.startsWith("8")) {
-                newName = replace(name, "8", "eight");
-            } else if (name.startsWith("9")) {
-                newName = replace(name, "9", "nine");
-            } else if (name.startsWith("10")) {
-                newName = replace(name, "10", "ten");
-            } else if (name.startsWith("ace") && name.contains("2")) {
-                file.delete();
-            } else if (name.startsWith("jack") && !name.contains("2")) {
-                file.delete();
-            } else if (name.startsWith("king") && !name.contains("2")) {
-                file.delete();
-            } else if (name.startsWith("queen") && !name.contains("2")) {
-                file.delete();
-            } else if (name.startsWith("jack") && name.contains("2")) {
-                newName = replace(name, "2", "");
-            } else if (name.startsWith("king") && name.contains("2")) {
-                newName = replace(name, "2", "");
-            } else if (name.startsWith("queen") && name.contains("2")) {
-                newName = replace(name, "2", "");
+        Integer[] toHitCards = {2, 3, 7, 1};
+        Integer[] myCards = {1, 4, 5, 6};
+
+        Map<Integer, List<Integer>> map = new HashMap<>();
+        for (Integer hc : toHitCards) {
+            List<Integer> bcs = new LinkedList<>();
+            for (Integer mc : myCards) {
+                if (canHit(mc, hc)) {
+                    bcs.add(mc);
+                }
             }
-            String absolutePath = file.getAbsolutePath();
-            if (newName != null) {
-                String newAbsolutePath = absolutePath.replace(name, newName);
-                file.renameTo(new File(newAbsolutePath));
+
+            map.put(hc, bcs);
+        }
+
+        List<Integer[]> in = new LinkedList<>();
+        for (Map.Entry<Integer, List<Integer>> entry : map.entrySet()) {
+            List<Integer> value = entry.getValue();
+            for (Integer ir : value) {
+                in.add(new Integer[]{ir, entry.getKey()});
             }
+        }
+
+        List<List<Integer[]>> result = new LinkedList<>();
+        for (int i = toHitCards.length; i < in.size(); i++) {
+            List<List<Integer[]>> combinations = combinations(in, i);
+
+            for (List<Integer[]> combination: combinations){
+                boolean passed = true;
+                Set<Integer> unique = new HashSet<>();
+                for (Integer[] integers : combination){
+                    for (Integer integer: integers) {
+                        if (unique.contains(integer)) {
+                            passed = false;
+                            break;
+                        } else {
+                            unique.add(integer);
+                        }
+                    }
+                    if (!passed) {
+                        break;
+                    }
+                }
+                if (passed) {
+                    result.add(combination);
+                }
+            }
+        }
+
+        for (List<Integer[]> arrList : result) {
+            StringBuilder sb = new StringBuilder("[");
+            for (int j = 0; j < arrList.size(); j++) {
+                Integer[] arr = arrList.get(j);
+                sb.append('[')
+                        .append(arr[0])
+                        .append(", ")
+                        .append(arr[1]);
+                if (j == arrList.size() - 1) {
+                    sb.append(']');
+                } else {
+                    sb.append("], ");
+                }
+            }
+            sb.append("], ");
+            System.out.println(sb);
         }
     }
 
-    private static String replace(String oldName, String replace, String replacement) {
-        return oldName.replace(replace, replacement);
+    private static boolean canHit(Integer i1, Integer i2) {
+        return i1 > i2;
+    }
+
+    public static <T> List<List<T>> combinations(List<T> values, int size) {
+
+        if (0 == size) {
+            return Collections.singletonList(Collections.<T>emptyList());
+        }
+
+        if (values.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        List<List<T>> combination = new LinkedList<List<T>>();
+
+        T actual = values.iterator().next();
+
+        List<T> subSet = new LinkedList<T>(values);
+        subSet.remove(actual);
+
+        List<List<T>> subSetCombination = combinations(subSet, size - 1);
+
+        for (List<T> set : subSetCombination) {
+            List<T> newSet = new LinkedList<T>(set);
+            newSet.add(0, actual);
+            combination.add(newSet);
+        }
+
+        combination.addAll(combinations(subSet, size));
+
+        return combination;
     }
 }

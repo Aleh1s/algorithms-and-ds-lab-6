@@ -10,8 +10,6 @@ import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 
 import java.io.IOException;
-import java.util.UUID;
-
 public class HelloController {
 
     @FXML
@@ -21,7 +19,7 @@ public class HelloController {
     protected void onGoButtonClick(ActionEvent event) throws IOException {
         String username = usernameTextField.getText();
         if (username.isBlank())
-            username = UUID.randomUUID().toString();
+            username = "user";
 
         FXMLLoader loader = new FXMLLoader(HelloController.class.getResource("/org.example/main-scene.fxml"));
         Parent root = loader.load();

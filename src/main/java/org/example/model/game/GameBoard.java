@@ -1,9 +1,14 @@
-package org.example.model;
+package org.example.model.game;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.example.model.Utils;
+import org.example.model.game.card.Card;
+import org.example.model.game.card.Rank;
+import org.example.model.game.card.Suit;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Редуду
@@ -42,16 +47,34 @@ public class GameBoard {
     private static final Logger log = LogManager.getLogger(GameBoard.class);
     private Stack<Card> generalDeck;
     private Card generalTrump;
-    private LinkedList<Card> currCards;
-    private HashMap<Card, Card> beatenCards;
-    private Player attackingPlayer;
-    private Player defendingPlayer;
+    private Suit generalTrumpSuit;
+    private List<Entry> playingEntries;
+    private Player user;
+    private Player bot;
+    private boolean isUserNext;
+    private boolean isUserAttacking;
     private static final int PLAYERS_DECK_SIZE = 12;
     private static final int PLAYER_CARDS_SIZE = 7;
 
     private GameBoard() {
-        currCards = new LinkedList<>();
-        beatenCards = new HashMap<>();
+        playingEntries = new LinkedList<>();
+    }
+
+    private GameBoard(
+            Stack<Card> generalDeck,
+            Card generalTrump,
+            Suit generalTrumpSuit,
+            List<Entry> playingEntries,
+            Player user, Player bot,
+            boolean isUserNext, boolean isUserAttacking) {
+        this.generalDeck = generalDeck;
+        this.generalTrump = generalTrump;
+        this.playingEntries = playingEntries;
+        this.generalTrumpSuit = generalTrumpSuit;
+        this.user = user;
+        this.bot = bot;
+        this.isUserNext = isUserNext;
+        this.isUserAttacking = isUserAttacking;
     }
 
     public static GameBoard newGameBoard() {
@@ -66,7 +89,45 @@ public class GameBoard {
         return generalTrump;
     }
 
-    public LinkedList<Card> getCurrCards() {return currCards;}
+    public Player getUser() {
+        return user;
+    }
+
+    public void setUser(Player user) {
+        this.user = user;
+    }
+
+    public Player getBot() {
+        return bot;
+    }
+
+    public void setBot(Player bot) {
+        this.bot = bot;
+    }
+
+    public boolean isUserNext() {
+        return isUserNext;
+    }
+
+    public void setUserNext(boolean userNext) {
+        this.isUserNext = userNext;
+    }
+
+    public boolean isUserAttacking() {
+        return isUserAttacking;
+    }
+
+    public void setUserAttacking(boolean userAttacking) {
+        isUserAttacking = userAttacking;
+    }
+
+    public List<Entry> getPlayingEntries() {
+        return playingEntries;
+    }
+
+    public Suit getGeneralTrumpSuit() {
+        return generalTrumpSuit;
+    }
 
     public void initDeck() {
         log.trace("Init deck is invoked");
@@ -94,20 +155,34 @@ public class GameBoard {
         log.debug("Player cards number is {}", cards.size());
         log.debug("Cards state {}", cards);
         log.debug("Game board deck size id {}", generalDeck.size());
-        player.setCards(cards);
+        player.setHand(cards);
         log.trace("Give cards is terminated");
     }
 
     public void giveTrump(Player player) {
         log.trace("Give trump is invoked");
-        player.setTrump(generalDeck.pop());
+        Card trump = getDeckCardsListWithoutJokers().get(0);
+        player.setTrump(trump);
+        log.debug("Player {} got {} trump", player.getName(), trump);
+        player.setTrumpSuit(trump.getSuit());
+        log.debug("Player {} got {} trump suit", player.getName(), trump.getSuit());
+        generalDeck.remove(trump);
         log.trace("Give trump is terminated");
     }
 
-    public void setGeneralTrump() {
+    public void initGeneralTrump() {
         log.trace("Set general trump is invoked");
-        this.generalTrump = generalDeck.pop();
+        Card trump = getDeckCardsListWithoutJokers().get(0);
+        this.generalTrump = trump;
+        this.generalTrumpSuit = trump.getSuit();
+        generalDeck.remove(trump);
         log.trace("Set general trump is terminated");
+    }
+
+    private List<Card> getDeckCardsListWithoutJokers() {
+        return generalDeck.stream()
+                .filter(card -> !card.getRank().equals(Rank.JOKER))
+                .toList();
     }
 
     public void giveDeck(Player player) {
@@ -122,15 +197,27 @@ public class GameBoard {
         log.trace("Give deck is terminated");
     }
 
-//    public void beatCard(Card hittingCard, Player hittingPlayer) {
-//        log.trace("Beat card is invoked");
-//
-//        log.debug("{} player tries to attack {} player", hittingPlayer, defendingPlayer);
-//        if (!hittingPlayer.equals(attackingPlayer))
-//            throw new IllegalStateException("Wrong hitting player");
-//
-//        log.debug("{} card tries to beat {}", hittingCard, currCard);
-//        if (currCard.isGreaterThan(hittingCard))
-//            throw new IllegalStateException("Cannot beat card");
-//    }
+    public void setGeneralTrump(Card generalTrump) {
+        this.generalTrump = generalTrump;
+    }
+
+    @SuppressWarnings("unchecked")
+    public GameBoard copy() {
+        Stack<Card> generalDeckCopy = (Stack<Card>) this.generalDeck.clone();
+        List<Entry> playingEntriesCopy = this.playingEntries.stream()
+                .map(entry -> entry.copy())
+                .collect(Collectors.toList());
+        Player userCopy = this.user.copy();
+        Player botCopy = this.bot.copy();
+        return new GameBoard(
+                generalDeckCopy,
+                this.generalTrump,
+                this.generalTrumpSuit,
+                playingEntriesCopy,
+                userCopy,
+                botCopy,
+                this.isUserNext,
+                this.isUserAttacking
+        );
+    }
 }

@@ -1,12 +1,13 @@
-package org.example.model;
+package org.example.model.game.card;
 
-import javafx.event.EventHandler;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.Pane;
 import org.example.Constant;
+import org.example.model.Utils;
 
 import java.util.Map;
+import java.util.Optional;
 
 public class Card implements Comparable<Card> {
 
@@ -70,24 +71,15 @@ public class Card implements Comparable<Card> {
 
     @Override
     public int compareTo(Card another) {
-        return Integer.compare(rank.getAmount(), another.rank.getAmount());
+        return Integer.compare(rank.getValue(), another.rank.getValue());
     }
 
     public boolean isGreaterThan(Card another) {
         return this.compareTo(another) > 0;
     }
 
-    public ImageView render() {
-        Map<Card, Image> cardImageMap = Utils.getCardImageMap();
-        Image image = cardImageMap.get(this);
-        ImageView view = new ImageView(image);
-        view.setFitHeight(150);
-        view.setFitWidth(100);
-        return view;
-    }
-
-    public ImageView renderActive(EventHandler<? super MouseEvent> eventHandler) {
-        ImageView imageView = render();
+    public ImageView renderActive(Pane pane) {
+        ImageView imageView = null;
         imageView.setOnMouseEntered(mouseEvent -> {
             if (!isChosen)
                 imageView.setOpacity(0.8);
@@ -96,19 +88,38 @@ public class Card implements Comparable<Card> {
             if (!isChosen)
                 imageView.setOpacity(1);
         });
-        imageView.setOnMouseClicked(eventHandler);
         return imageView;
     }
 
-    public static ImageView renderBackSide() {
-        Image image = new Image(Constant.CARD_BACK_SIZE);
+    public void render(Pane pane) {
+        render(this, pane);
+    }
+
+    public ImageView toImageView() {
+        return toImageView(this);
+    }
+
+    public static void render(Card card, Pane pane) {
+        ImageView imageView = toImageView(card);
+        pane.getChildren().add(imageView);
+    }
+
+    private static ImageView toImageView(Card card) {
+        Image image = toImage(card);
         ImageView imageView = new ImageView(image);
-        imageView.setFitHeight(150);
-        imageView.setFitWidth(100);
+        setSize(imageView);
         return imageView;
     }
 
-    public boolean hasSameSuit(Card another) {
-        return this.suit.equals(another.suit);
+    private static Image toImage(Card card) {
+        Map<Card, Image> cardImageMap = Utils.getCardImageMap();
+        return Optional.ofNullable(card)
+                .map(cardImageMap::get)
+                .orElse(new Image(Constant.CARD_BACK_SIDE));
+    }
+
+    private static void setSize(ImageView imageView) {
+        imageView.setFitHeight(Constant.CARD_HEIGHT);
+        imageView.setFitWidth(Constant.CARD_WIDTH);
     }
 }

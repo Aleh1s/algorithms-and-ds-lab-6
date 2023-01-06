@@ -1,4 +1,4 @@
-package org.example.model;
+package org.example.model.game;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -11,18 +11,19 @@ public class GameSession {
     private static final Logger log = LogManager.getLogger(GameSession.class);
     private final Player user;
     private final Player bot;
-    private final GameBoard gameBoard;
-    private Player next;
+    private GameBoard gameBoard;
     private Player looser;
 
-    private GameSession(Player user) {
+    private GameSession(Player user, Player bot) {
         this.user = user;
-        this.bot = Player.newPlayer("bot");
+        this.bot = bot;
         this.gameBoard = GameBoard.newGameBoard();
+        gameBoard.setUser(this.user);
+        gameBoard.setBot(this.bot);
     }
 
-    public static GameSession newGameSession(Player user) {
-        return new GameSession(user);
+    public static GameSession newGameSession(Player user, Player bot) {
+        return new GameSession(user, bot);
     }
 
     public void start() {
@@ -33,7 +34,7 @@ public class GameSession {
         this.gameBoard.giveCards(bot);
         this.gameBoard.giveTrump(user);
         this.gameBoard.giveTrump(bot);
-        this.gameBoard.setGeneralTrump();
+        this.gameBoard.initGeneralTrump();
         this.gameBoard.giveDeck(user);
         this.gameBoard.giveDeck(bot);
         this.chooseNextPlayer();
@@ -43,15 +44,18 @@ public class GameSession {
     private void chooseNextPlayer() {
         log.trace("Choose next player is invoked");
         if (Objects.nonNull(looser)) {
-            next = looser;
+            gameBoard.setUserNext(looser == user);
+            gameBoard.setUserAttacking(looser == user);
             log.debug("Next player is looser");
         } else {
             int random = ThreadLocalRandom.current().nextInt(0, 2);
             if (random == 0) {
-                next = user;
+                gameBoard.setUserNext(true);
+                gameBoard.setUserAttacking(true);
                 log.debug("Next player is user");
             } else {
-                next = bot;
+                gameBoard.setUserNext(false);
+                gameBoard.setUserAttacking(false);
                 log.debug("Next player is bot");
             }
         }
@@ -68,5 +72,9 @@ public class GameSession {
 
     public GameBoard getGameBoard() {
         return gameBoard;
+    }
+
+    public void setGameBoard(GameBoard gameBoard) {
+        this.gameBoard = gameBoard;
     }
 }
