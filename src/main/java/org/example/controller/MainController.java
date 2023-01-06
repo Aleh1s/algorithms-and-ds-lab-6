@@ -388,7 +388,7 @@ public class MainController {
 
     private void renderBotHand() {
         Player bot = gameBoard.getBot();
-        sortByRank(bot.getHand()).forEach(card -> Card.render(card, botCardsHBox)); // todo: change card to null inside render
+        sortByRank(bot.getHand()).forEach(card -> Card.render(null, botCardsHBox));
     }
 
     private void renderPlayerTrump(Player player, Pane pane) {
